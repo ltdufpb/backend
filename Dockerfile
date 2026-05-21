@@ -37,13 +37,14 @@ RUN --mount=type=cache,target=/root/.gradle/caches \
 # 3) Runtime Stage
 # ============================
 FROM eclipse-temurin:21-jre-jammy AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends fontconfig libfreetype6 && rm -rf /var/lib/apt/lists/*
 
 RUN addgroup --system --gid 1001 appgroup && \
     adduser --system --uid 1001 --ingroup appgroup appuser
 
 WORKDIR /app
 
-COPY --from=build --chown=appuser:appgroup /app/build/libs/registration-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=build --chown=appuser:appgroup /app/build/libs/*.jar /app/app.jar
 
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 
